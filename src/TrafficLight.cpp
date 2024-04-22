@@ -11,10 +11,11 @@ T MessageQueue<T>::receive()
     // to wait for and receive new messages and pull them from the queue using move semantics. 
     // The received object should then be returned by the receive function. 
     std::unique_lock<std::mutex> lk(_mt);
-    _cond.wait();
+    _cond.wait(lk);
     auto msg = std::move(_queue.front());
-    _queue.pop_front()
+    _queue.pop_front();
     return msg;
+    
 }
 
 template <typename T>
@@ -24,6 +25,7 @@ void MessageQueue<T>::send(T &&msg)
     // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
     std::lock_guard<std::mutex> lk(_mt);
     _cond.notify_one();
+    _queue.emplace_front(msg);
 }
 
 
@@ -74,7 +76,6 @@ void TrafficLight::cycleThroughPhases()
         // compute time
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         cycle++;
-        
         // toggle
         if(cycle == 5)
         {        
