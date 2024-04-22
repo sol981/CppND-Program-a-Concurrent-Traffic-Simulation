@@ -71,13 +71,20 @@ void TrafficLight::cycleThroughPhases()
     // init stop watch
     auto cycle = 0;
 
+    std::random_device rd;
+    std::mt19937 gen(rd()); // Seed the generator with system entropy
+    std::uniform_int_distribution<> dis(4, 6); // Set distribution for 4-6
+
+    // Generate a random number within the range
+    int num = dis(gen);
+
     while(true)
     {
         // compute time
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         cycle++;
         // toggle
-        if(cycle == 5)
+        if(cycle == num)
         {        
             if (_currentPhase == TrafficLightPhase::green) {
                 _currentPhase = TrafficLightPhase::red;
